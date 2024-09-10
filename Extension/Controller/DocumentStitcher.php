@@ -17,43 +17,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace FacturaScripts\Plugins\PedidosPendientes;
+namespace FacturaScripts\Plugins\PedidosPendientes\Extension\Controller;
 
-use FacturaScripts\Core\Base\AjaxForms\PurchasesHeaderHTML;
-use FacturaScripts\Core\Base\AjaxForms\SalesHeaderHTML;
-use FacturaScripts\Core\Template\InitClass;
+use Closure;
+use FacturaScripts\Core\Model\Base\TransformerDocument;
 
 /**
- * Description of Init
+ * Description of DocumentStitcher
  *
  * @author Jose Antonio Cuello Principal <yopli2000@gmail.com>
+ *
+ * @property TransformerDocument[] $documents
  */
-class Init extends InitClass
+class DocumentStitcher
 {
 
-    /**
-     * Code to load every time FacturaScripts starts.
-     */
-    public function init(): void
+    protected function checkPrototype(): Closure
     {
-        $this->loadExtension(new Extension\Controller\DocumentStitcher());
-        $this->loadExtension(new Extension\Model\PedidoCliente());
-        $this->loadExtension(new Extension\Model\PedidoProveedor());
-        PurchasesHeaderHTML::addMod(new Mod\PurchasesHeaderHTMLMod());
-        SalesHeaderHTML::addMod(new Mod\SalesHeaderHTMLMod());
-    }
-
-    /**
-     * Code to load every time the plugin is enabled or updated.
-     */
-    public function update(): void
-    {
-    }
-
-    /**
-     * Code that is executed when uninstalling a plugin.
-     */
-    public function uninstall(): void
-    {
+        return function ($prototype, $newLines) {
+            foreach ($this->documents as $doc) {
+                if ($doc->modelClassName() === 'PedidoCliente') {
+                    $doc->save();
+                }
+            }
+            return true;
+        };
     }
 }

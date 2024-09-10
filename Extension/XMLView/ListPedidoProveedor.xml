@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of PedidosPendientes plugin for FacturaScripts.
+    FacturaScripts    Copyright (C) 2015-2024 Carlos Garcia Gomez <carlos@facturascripts.com>
+    PedidosPendientes Copyright (C) 2023-2024 Jose Antonio Cuello Principal <yopli2000@gmail.com>
+
+    This program and its files are under the terms of the license specified in the LICENSE file.
+
+    Document   : ListPedidosProveedor.xml
+    Author     : Jose Antonio Cuello <yopli2000@gmail.com>
+    Description:
+        Add new fields columns to master ListPedidosProveedor
+-->
+<view>
+    <columns>
+        <column name="served" display="center" order="430">
+            <widget type="select" fieldname="servido" translate="true">
+                <values title="pending">0</values>
+                <values title="partial">1</values>
+                <values title="completed">100</values>
+            </widget>
+        </column>
+    </columns>
+</view>
