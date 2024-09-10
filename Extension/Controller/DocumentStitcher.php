@@ -36,7 +36,7 @@ class DocumentStitcher
     {
         return function ($prototype, $newLines) {
             foreach ($this->documents as $doc) {
-                if ($doc->modelClassName() === 'PedidoCliente') {
+                if (in_array($doc->modelClassName(), ['PedidoCliente', 'PedidoProveedor'])) {
                     $doc->save();
                 }
             }

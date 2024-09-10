@@ -28,6 +28,7 @@ use FacturaScripts\Plugins\PedidosPendientes\Lib\PedidosPendientes\PedidoPendien
  *
  * @author Jose Antonio Cuello Principal <yopli2000@gmail.com>
  *
+ * @property bool $editable
  * @property int $idpedido
  * @property int $servido
  */
@@ -43,34 +44,36 @@ class PedidoProveedor
     public function saveUpdateBefore(): Closure
     {
         return function (): bool {
+            if (false === $this->editable) {
+                $this->servido = PedidoPendiente::SERVED_COMPLETE;
+                return true;
+            }
+
             $database = new DataBase();
             $data = $database->select($this->getSqlServed($this->idpedido));
-            $this->servido = $data['servido'] ?? $this->servido;
+            $this->servido = $data[0]['servido'] ?? $this->servido;
             return true;
         };
     }
 
-    public function getSqlPartial(): Closure
+    protected function getSqlPartial(): Closure
     {
         return function (int $id): string {
             return 'SELECT ' . PedidoPendiente::SERVED_PARTIAL
-                . ' FROM lineaspedidosprov t3'
-                . ' WHERE t3.idpedido = ' . $id
-                . ' AND t3.servido >= t3.cantidad'
+                . ' FROM lineaspedidosprov'
+                . ' WHERE idpedido = ' . $id
+                . ' AND servido >= cantidad'
                 . ' LIMIT 1';
         };
     }
 
-    public static function getSqlServed(): Closure
+    protected function getSqlServed(): Closure
     {
         return function (int $id): string {
-            return 'SELECT CASE WHEN t2.editable = false'
-                . ' THEN ' . PedidoPendiente::SERVED_COMPLETE
-                . ' ELSE COALESCE((' . $this->getSqlPartial($id) . '), ' . PedidoPendiente::SERVED_NONE . ')'
-                . ' END servido'
-                . ' FROM pedidosprov t1'
-                . ' INNER JOIN estados_documentos t2 ON t2.idestado = t1.idestado'
-                . ' WHERE t1.idpedido = ' . $id;
+            $sqlPartial = '(' . $this->getSqlPartial($id) . ')';
+            return 'SELECT COALESCE(' . $sqlPartial . ', ' . PedidoPendiente::SERVED_NONE . ') AS servido'
+                . ' FROM pedidosprov'
+                . ' WHERE idpedido = ' . $id;
         };
     }
 }

@@ -37,6 +37,8 @@ class Init extends InitClass
     public function init(): void
     {
         $this->loadExtension(new Extension\Controller\DocumentStitcher());
+        $this->loadExtension(new Extension\Controller\ListPedidoCliente());
+        $this->loadExtension(new Extension\Controller\ListPedidoProveedor());
         $this->loadExtension(new Extension\Model\PedidoCliente());
         $this->loadExtension(new Extension\Model\PedidoProveedor());
         PurchasesHeaderHTML::addMod(new Mod\PurchasesHeaderHTMLMod());

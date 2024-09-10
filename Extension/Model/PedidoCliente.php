@@ -28,6 +28,7 @@ use FacturaScripts\Plugins\PedidosPendientes\Lib\PedidosPendientes\PedidoPendien
  *
  * @author Jose Antonio Cuello Principal <yopli2000@gmail.com>
  *
+ * @property bool $editable
  * @property int $idpedido
  * @property int $servido
  */
