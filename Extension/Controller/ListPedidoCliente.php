@@ -20,6 +20,7 @@
 namespace FacturaScripts\Plugins\PedidosPendientes\Extension\Controller;
 
 use Closure;
+use FacturaScripts\Core\DataSrc\Empresas;
 use FacturaScripts\Core\Tools;
 use FacturaScripts\Dinamic\Lib\PedidosPendientes\PedidoPendiente;
 
@@ -37,6 +38,7 @@ class ListPedidoCliente
     public function createViews(): Closure
     {
         return function () {
+            $this->createViewsPendingLines();
             if (isset($this->views['ListPedidoCliente'])) {
                 $options = [
                     ['code' => '', 'description' => '------'],
@@ -46,6 +48,27 @@ class ListPedidoCliente
                 ];
                 $this->addFilterSelect('ListPedidoCliente', 'served', 'served', 'servido', $options);
             }
+        };
+    }
+
+    public function createViewsPendingLines(): Closure
+    {
+        return function ($viewName = 'ListOrderPending') {
+            $this->addView($viewName, 'Join\LineOrderPending', 'pending', 'far fa-list-alt');
+            $this->addSearchFields($viewName, [
+                'cp.codigo', 'cp.codcliente', 'cp.nombrecliente',
+                'pr.referencia', 'pr.descripcion', 'lp.referencia',
+            ]);
+
+            $this->addOrderBy($viewName, ['pr.referencia, lp.referencia'], 'reference');
+            $this->addOrderBy($viewName, ['cp.codcliente, pr.referencia, lp.referencia'], 'customer');
+            $this->addOrderBy($viewName, ['cp.finoferta, pr.referencia, lp.referencia'], 'service-date');
+
+            $this->addFilterPeriod($viewName, 'service', 'service-date', 'finoferta');
+            $this->addFilterAutocomplete($viewName, 'customer', 'customer', 'cp.codcliente', 'Cliente', 'codcliente', 'nombre');
+            $this->addFilterAutocomplete($viewName, 'product', 'product', 'pr.referencia', 'Producto', 'referencia', 'descripcion');
+            $this->addFilterAutocomplete($viewName, 'reference', 'reference', 'lp.referencia', 'Variante', 'referencia', 'referencia');
+            $this->addFilterSelect($viewName, 'company', 'company', 'cp.idempresa', Empresas::codeModel());
         };
     }
 }

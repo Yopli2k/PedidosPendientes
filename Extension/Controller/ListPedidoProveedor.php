@@ -20,6 +20,7 @@
 namespace FacturaScripts\Plugins\PedidosPendientes\Extension\Controller;
 
 use Closure;
+use FacturaScripts\Core\DataSrc\Empresas;
 use FacturaScripts\Core\Tools;
 use FacturaScripts\Dinamic\Lib\PedidosPendientes\PedidoPendiente;
 
@@ -37,6 +38,7 @@ class ListPedidoProveedor
     public function createViews(): Closure
     {
         return function () {
+            $this->createViewsPendingLines();
             if (isset($this->views['ListPedidoProveedor'])) {
                 $options = [
                     ['code' => '', 'description' => '------'],
@@ -46,6 +48,25 @@ class ListPedidoProveedor
                 ];
                 $this->addFilterSelect('ListPedidoProveedor', 'served', 'served', 'servido', $options);
             }
+        };
+    }
+
+    public function createViewsPendingLines(): Closure
+    {
+        return function ($viewName = 'ListSupplierOrderPending') {
+            $this->addView($viewName, 'Join\LineSupplierOrderPending', 'pending', 'far fa-list-alt');
+            $this->addSearchFields($viewName, [
+                'cp.codigo', 'cp.codproveedor', 'cp.nombre',
+                'pr.referencia', 'pr.descripcion', 'lp.referencia',
+            ]);
+
+            $this->addOrderBy($viewName, ['pr.referencia, lp.referencia'], 'reference');
+            $this->addOrderBy($viewName, ['cp.codproveedor, pr.referencia, lp.referencia'], 'supplier');
+
+            $this->addFilterAutocomplete($viewName, 'supplier', 'supplier', 'cp.codproveedor', 'Proveedor', 'codproveedor', 'nombre');
+            $this->addFilterAutocomplete($viewName, 'product', 'product', 'pr.referencia', 'Producto', 'referencia', 'descripcion');
+            $this->addFilterAutocomplete($viewName, 'reference', 'reference', 'lp.referencia', 'Variante', 'referencia', 'referencia');
+            $this->addFilterSelect($viewName, 'company', 'company', 'cp.idempresa', Empresas::codeModel());
         };
     }
 }
