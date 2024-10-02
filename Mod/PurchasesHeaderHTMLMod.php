@@ -35,9 +35,6 @@ class PurchasesHeaderHTMLMod implements PurchasesModInterface
 {
     public function apply(PurchaseDocument &$model, array $formData, User $user)
     {
-        if (property_exists($model, 'servido')) {
-            $model->servido = (int)$formData['servido'] ?? $model->servido;
-        }
     }
 
     public function applyBefore(PurchaseDocument &$model, array $formData, User $user)
@@ -74,7 +71,7 @@ class PurchasesHeaderHTMLMod implements PurchasesModInterface
 
     private static function servido(Translator $i18n, PurchaseDocument $model): string
     {
-        if (false === property_exists($model, 'servido') || empty($model->primaryColumnValue())) {
+        if (false === property_exists($model, 'servido')) {
             return '';
         }
 
@@ -83,18 +80,11 @@ class PurchasesHeaderHTMLMod implements PurchasesModInterface
             PedidoPendiente::SERVED_PARTIAL => $i18n->trans('partial'),
             PedidoPendiente::SERVED_COMPLETE => $i18n->trans('completed'),
         ];
-        $options = [];
-        foreach ($values as $key => $value) {
-            $options[] = ($key === $model->servido) ?
-                '<option value="' . $key . '" selected="">' . $value . '</option>' :
-                '<option value="' . $key . '">' . $value . '</option>';
-        }
 
-        $attributes = $model->editable ? 'name="servido"' : 'disabled=""';
         return '<div class="col-sm-6">'
             . '<div class="form-group">'
             . $i18n->trans('served')
-            . '<select ' . $attributes . ' class="form-control">' . implode('', $options) . '</select>'
+            . '<input type="text" class="form-control" disabled value="' . $values[$model->servido] . '" />'
             . '</div>'
             . '</div>';
     }
