@@ -42,7 +42,7 @@
             <widget type="number" fieldname="pendiente"/>
         </column>
         <column name="price" display="right" order="200">
-            <widget type="money" fieldname="pvpunitario" totals="false"/>
+            <widget type="money" fieldname="pvpunitario"/>
         </column>
         <column name="dto" display="right" order="210">
             <widget type="percentage" fieldname="dtopor"/>
